@@ -25,14 +25,17 @@ export default function AudioPlayer({ isMuted }: AudioPlayerProps) {
         masterVolumeRef.current = masterGain;
 
         // --- Procedural Romantic Chime & Pad Synthesizer ---
-        // Scale notes (Frequencies in G Major / E Minor pentatonic)
-        // G3, A3, B3, D4, E4, G4, A4, B4, D5, E5
-        const scale = [196.00, 220.00, 246.94, 293.66, 329.63, 392.00, 440.00, 493.88, 587.33, 659.25];
+        // Scale notes (Frequencies in G Major / E Minor)
+        const scale = [196.00, 220.00, 246.94, 261.63, 293.66, 329.63, 369.99, 392.00, 440.00, 493.88, 523.25, 587.33, 659.25, 739.99, 783.99];
         const chords = [
-          [196.00, 246.94, 293.66, 392.00], // G Maj (G, B, D, G)
-          [220.00, 261.63, 329.63, 440.00], // A Min (A, C, E, A)
-          [164.81, 246.94, 329.63, 392.00], // E Min (E, B, E, G)
-          [174.61, 220.00, 261.63, 349.23], // F Maj (F, A, C, F)
+          [196.00, 246.94, 293.66, 392.00], // G Maj (G3, B3, D4, G4)
+          [146.83, 220.00, 293.66, 369.99], // D Maj (D3, A3, D4, F#4)
+          [164.81, 196.00, 246.94, 329.63], // E Min (E3, G3, B3, E4)
+          [146.83, 185.00, 246.94, 293.66], // B Min (D3, F#3, B3, D4)
+          [130.81, 164.81, 261.63, 329.63], // C Maj (C3, E3, C4, E4)
+          [196.00, 246.94, 293.66, 392.00], // G Maj (G3, B3, D4, G4)
+          [130.81, 196.00, 261.63, 329.63], // C Maj (C3, G3, C4, E4)
+          [146.83, 220.00, 293.66, 369.99], // D Maj (D3, A3, D4, F#4)
         ];
 
         let chordIndex = 0;
@@ -161,8 +164,8 @@ export default function AudioPlayer({ isMuted }: AudioPlayerProps) {
 
           // Schedule sparkling wind-chime arpeggios every 2 seconds
           if (now >= nextChimeTime - 0.5) {
-            // Pick a random frequency from the G-Major Pentatonic Scale (skewed high)
-            const freqIndex = Math.floor(Math.random() * 5) + 5; 
+            // Pick a random frequency from the G-Major Scale (skewed higher for sparkly bells)
+            const freqIndex = Math.floor(Math.random() * 8) + 7; 
             const freq = scale[freqIndex];
             
             // Random tiny offsets to make it sound hand-played

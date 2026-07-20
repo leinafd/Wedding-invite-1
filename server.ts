@@ -2,13 +2,21 @@ import express from "express";
 import path from "path";
 import fs from "fs";
 import { createServer as createViteServer } from "vite";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
 const PORT = 3000;
 const RSVPS_FILE = path.join(process.cwd(), "rsvps.json");
+const ADMIN_PASSCODE = process.env.ADMIN_PASSCODE || "NichelleEniola2026";
 
 // Middleware
-app.use(express.json());
+app.use(express.json({ limit: "20mb" }));
+app.use(express.urlencoded({ limit: "20mb", extended: true }));
+
+// Serve static assets from our local assets folder directly in both dev and prod
+app.use("/assets", express.static(path.join(process.cwd(), "assets")));
 
 // Initialize rsvps.json if not exists
 if (!fs.existsSync(RSVPS_FILE)) {
@@ -70,7 +78,7 @@ app.post("/api/rsvps", (req, res) => {
 app.get("/api/rsvps", (req, res) => {
   const passcode = req.headers["x-admin-passcode"];
   
-  if (passcode !== "NichelleEniola2026") {
+  if (passcode !== ADMIN_PASSCODE) {
     return res.status(401).json({ error: "Unauthorized. Invalid passcode." });
   }
 
@@ -83,7 +91,7 @@ app.delete("/api/rsvps/:id", (req, res) => {
   const passcode = req.headers["x-admin-passcode"];
   const { id } = req.params;
 
-  if (passcode !== "NichelleEniola2026") {
+  if (passcode !== ADMIN_PASSCODE) {
     return res.status(401).json({ error: "Unauthorized. Invalid passcode." });
   }
 
@@ -99,6 +107,51 @@ app.delete("/api/rsvps/:id", (req, res) => {
     res.json({ success: true });
   } else {
     res.status(500).json({ error: "Failed to update RSVPs." });
+  }
+});
+
+// Upload couple photo (Protected by passcode)
+app.post("/api/upload-photo", (req, res) => {
+  const passcode = req.headers["x-admin-passcode"];
+  const { photoIndex, base64Data } = req.body;
+
+  if (passcode !== ADMIN_PASSCODE) {
+    return res.status(401).json({ error: "Unauthorized. Invalid passcode." });
+  }
+
+  if (photoIndex !== 1 && photoIndex !== 2) {
+    return res.status(400).json({ error: "Invalid photoIndex. Must be 1 or 2." });
+  }
+
+  if (!base64Data) {
+    return res.status(400).json({ error: "No base64Data provided." });
+  }
+
+  try {
+    // Extract base64 content
+    const matches = base64Data.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+    if (!matches || matches.length !== 3) {
+      return res.status(400).json({ error: "Invalid base64 data format." });
+    }
+
+    const buffer = Buffer.from(matches[2], "base64");
+    const assetsDir = path.join(process.cwd(), "assets");
+    
+    // Ensure assets directory exists
+    if (!fs.existsSync(assetsDir)) {
+      fs.mkdirSync(assetsDir, { recursive: true });
+    }
+
+    const fileName = `couple_photo${photoIndex}.jpg`;
+    const filePath = path.join(assetsDir, fileName);
+
+    fs.writeFileSync(filePath, buffer);
+    console.log(`Successfully saved photo to: ${filePath}`);
+
+    res.json({ success: true, url: `/assets/${fileName}` });
+  } catch (error: any) {
+    console.error("Error saving uploaded photo:", error);
+    res.status(500).json({ error: "Failed to save photo on server: " + error.message });
   }
 });
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { RSVP, RSVPStats } from "../types";
-import { Trash2, Download, Copy, Check, Users, HelpCircle, XCircle, ChevronLeft, Lock } from "lucide-react";
+import { Trash2, Download, Copy, Check, Users, HelpCircle, XCircle, ChevronLeft, Lock, Upload, Camera, Image as ImageIcon, Sparkles } from "lucide-react";
 
 interface AdminDashboardProps {
   onBackToInvitation: () => void;
@@ -13,6 +13,67 @@ export default function AdminDashboard({ onBackToInvitation }: AdminDashboardPro
   const [rsvps, setRsvps] = useState<RSVP[]>([]);
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Photo upload states
+  const [uploading1, setUploading1] = useState(false);
+  const [uploading2, setUploading2] = useState(false);
+  const [uploadSuccess1, setUploadSuccess1] = useState(false);
+  const [uploadSuccess2, setUploadSuccess2] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+
+  const handlePhotoUpload = async (photoIndex: 1 | 2, file: File) => {
+    const setUploading = photoIndex === 1 ? setUploading1 : setUploading2;
+    const setSuccess = photoIndex === 1 ? setUploadSuccess1 : setUploadSuccess2;
+    
+    setUploading(true);
+    setUploadError("");
+    setSuccess(false);
+
+    try {
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        throw new Error("Please select an image file (JPG, PNG, etc.).");
+      }
+
+      // Convert to Base64
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = () => reject(new Error("Failed to read file."));
+        reader.readAsDataURL(file);
+      });
+
+      const base64Data = await base64Promise;
+
+      // Upload to server
+      const response = await fetch("/api/upload-photo", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-passcode": passcode,
+        },
+        body: JSON.stringify({
+          photoIndex,
+          base64Data,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to upload photo.");
+      }
+
+      setSuccess(true);
+      // Automatically reset success state after 4 seconds
+      setTimeout(() => setSuccess(false), 4000);
+    } catch (err: any) {
+      console.error("Upload error:", err);
+      setUploadError(err.message || "Something went wrong uploading your photo.");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   // Statistics
   const [stats, setStats] = useState<RSVPStats>({
@@ -206,10 +267,6 @@ export default function AdminDashboard({ onBackToInvitation }: AdminDashboardPro
               {loading ? "Authenticating..." : "Access RSVPs"}
             </button>
           </form>
-
-          <p className="font-sans text-[11px] text-[#8ea495] mt-6">
-            Tip: Passcode is NichelleEniola2026
-          </p>
         </div>
       </div>
     );
@@ -328,6 +385,125 @@ export default function AdminDashboard({ onBackToInvitation }: AdminDashboardPro
               <h3 className="font-serif text-xl md:text-2xl font-normal text-[#1a2e1a] mt-0.5">
                 {stats.totalUndecided}
               </h3>
+            </div>
+          </div>
+        </div>
+
+        {/* Featured Couple Photos Upload Section */}
+        <div className="bg-white border border-[#e5e0d8] rounded-2xl shadow-sm p-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-5 border-b border-[#f4f1ea] pb-4">
+            <div>
+              <h2 className="font-serif text-lg text-[#1a2e1a] font-normal flex items-center gap-2">
+                <span className="text-[#d4af37]">✨</span> Spotlight Photo Center
+              </h2>
+              <p className="font-sans text-xs text-gray-500 mt-1">
+                Upload your beautiful pictures to feature them in the romantic Polaroid slideshow on the main page.
+              </p>
+            </div>
+            <span className="self-start md:self-auto font-sans text-[10px] tracking-wider text-[#d4af37] bg-[#d4af37]/5 px-3 py-1 rounded-full uppercase font-medium">
+              Live Website Feature
+            </span>
+          </div>
+
+          {uploadError && (
+            <div className="bg-red-50 text-red-600 border border-red-100 rounded-xl px-4 py-3 text-xs font-sans mb-4">
+              {uploadError}
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Photo Card 1 */}
+            <div className="border border-dashed border-[#e5e0d8] hover:border-[#d4af37]/50 rounded-xl p-6 bg-[#fcfaf7] flex flex-col items-center justify-center text-center relative transition-all group min-h-[220px]">
+              <input
+                type="file"
+                id="photo-upload-1"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handlePhotoUpload(1, file);
+                }}
+                className="hidden"
+              />
+              <label
+                htmlFor="photo-upload-1"
+                className="cursor-pointer flex flex-col items-center justify-center space-y-3 w-full h-full"
+              >
+                {uploading1 ? (
+                  <div className="flex flex-col items-center space-y-2">
+                    <div className="w-8 h-8 rounded-full border-2 border-[#d4af37] border-t-transparent animate-spin" />
+                    <p className="font-sans text-xs text-[#d4af37] font-medium uppercase tracking-widest">Uploading Photo 1...</p>
+                  </div>
+                ) : uploadSuccess1 ? (
+                  <div className="flex flex-col items-center space-y-2">
+                    <div className="w-10 h-10 rounded-full bg-green-50 border border-green-200 flex items-center justify-center text-green-600 animate-bounce">
+                      <Check className="w-5 h-5" />
+                    </div>
+                    <p className="font-sans text-xs text-green-700 font-semibold uppercase tracking-wider">Photo 1 Featured Live!</p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="w-12 h-12 rounded-full bg-white border border-[#e5e0d8] text-[#8ea495] group-hover:text-[#d4af37] group-hover:border-[#d4af37] group-hover:shadow-sm flex items-center justify-center transition-all duration-300">
+                      <Upload className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="font-serif text-sm text-[#1a2e1a] font-semibold">Spotlight Photo 1</h4>
+                      <p className="font-sans text-[11px] text-gray-500 mt-1 max-w-xs leading-relaxed">
+                        Features the warm selfie of both of you at the evening lounge with große glass windows and blue lights.
+                      </p>
+                    </div>
+                    <span className="font-sans text-[10px] tracking-wider text-[#6c8675] uppercase bg-[#f4f1ea] px-3 py-1 rounded-md font-medium group-hover:bg-[#d4af37]/10 group-hover:text-[#d4af37] transition-all">
+                      Choose Photo 1
+                    </span>
+                  </>
+                )}
+              </label>
+            </div>
+
+            {/* Photo Card 2 */}
+            <div className="border border-dashed border-[#e5e0d8] hover:border-[#d4af37]/50 rounded-xl p-6 bg-[#fcfaf7] flex flex-col items-center justify-center text-center relative transition-all group min-h-[220px]">
+              <input
+                type="file"
+                id="photo-upload-2"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handlePhotoUpload(2, file);
+                }}
+                className="hidden"
+              />
+              <label
+                htmlFor="photo-upload-2"
+                className="cursor-pointer flex flex-col items-center justify-center space-y-3 w-full h-full"
+              >
+                {uploading2 ? (
+                  <div className="flex flex-col items-center space-y-2">
+                    <div className="w-8 h-8 rounded-full border-2 border-[#d4af37] border-t-transparent animate-spin" />
+                    <p className="font-sans text-xs text-[#d4af37] font-medium uppercase tracking-widest">Uploading Photo 2...</p>
+                  </div>
+                ) : uploadSuccess2 ? (
+                  <div className="flex flex-col items-center space-y-2">
+                    <div className="w-10 h-10 rounded-full bg-green-50 border border-green-200 flex items-center justify-center text-green-600 animate-bounce">
+                      <Check className="w-5 h-5" />
+                    </div>
+                    <p className="font-sans text-xs text-green-700 font-semibold uppercase tracking-wider">Photo 2 Featured Live!</p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="w-12 h-12 rounded-full bg-white border border-[#e5e0d8] text-[#8ea495] group-hover:text-[#d4af37] group-hover:border-[#d4af37] group-hover:shadow-sm flex items-center justify-center transition-all duration-300">
+                      <Upload className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="font-serif text-sm text-[#1a2e1a] font-semibold">Spotlight Photo 2</h4>
+                      <p className="font-sans text-[11px] text-gray-500 mt-1 max-w-xs leading-relaxed">
+                        Features the intimate close-up of Nichelle tilting her head lovingly with pink nails on Eniola's chest.
+                      </p>
+                    </div>
+                    <span className="font-sans text-[10px] tracking-wider text-[#6c8675] uppercase bg-[#f4f1ea] px-3 py-1 rounded-md font-medium group-hover:bg-[#d4af37]/10 group-hover:text-[#d4af37] transition-all">
+                      Choose Photo 2
+                    </span>
+                  </>
+                )}
+              </label>
             </div>
           </div>
         </div>

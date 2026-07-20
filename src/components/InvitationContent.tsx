@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { RSVP } from "../types";
 import { Calendar, MapPin, Clock, Shirt, Sparkles, Heart, ChevronRight, MessageSquare, Check, Music } from "lucide-react";
+import CouplePhotos from "./CouplePhotos";
 
 interface InvitationContentProps {
   onRSVPSubmitted: () => void;
@@ -428,39 +429,51 @@ export default function InvitationContent({ onRSVPSubmitted, onOpenAdmin, isMute
 
       {/* --- Section 4: Love Story / Couples Spotlight --- */}
       <section id="invitation-story" className="py-24 bg-[#f4f1ea] px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <Heart className="w-7 h-7 text-[#d4af37] mx-auto mb-4 animate-pulse fill-[#d4af37]/20" />
-          <h2 className="font-serif text-3xl text-[#1a2e1a] font-light tracking-wide mb-3">
-            Our Story inside the Garden
-          </h2>
-          <p className="font-sans text-xs tracking-[0.2em] text-[#8ea495] uppercase mb-12">
-            A Journey of Love &amp; Companionship
-          </p>
-
-          {/* Interactive Card Slider */}
-          <div className="relative max-w-xl mx-auto bg-white border border-[#e5e0d8] rounded-2xl p-8 shadow-[0_12px_40px_rgba(0,0,0,0.02)] min-h-[16rem] flex flex-col justify-between">
-            <div>
-              <div className="text-4xl mb-4">{slides[currentSlide].emoji}</div>
-              <h3 className="font-serif text-xl text-[#1a2e1a] font-semibold mb-3">
-                {slides[currentSlide].title}
-              </h3>
-              <p className="font-serif text-sm italic text-gray-600 leading-relaxed max-w-md mx-auto">
-                "{slides[currentSlide].desc}"
-              </p>
+        <div className="max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
+            {/* Left Column: Animated Living Polaroid Photo Frame */}
+            <div className="md:col-span-5 flex justify-center">
+              <CouplePhotos />
             </div>
 
-            {/* Slider Dots indicators */}
-            <div className="flex justify-center gap-2 mt-8">
-              {slides.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentSlide(idx)}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                    idx === currentSlide ? "bg-[#d4af37] w-4" : "bg-gray-200"
-                  }`}
-                  aria-label={`Go to slide ${idx + 1}`}
-                />
-              ))}
+            {/* Right Column: Love Story Details & Card Slider */}
+            <div className="md:col-span-7 text-center md:text-left space-y-6">
+              <div className="space-y-3">
+                <Heart className="w-7 h-7 text-[#d4af37] mx-auto md:mx-0 animate-pulse fill-[#d4af37]/20" />
+                <h2 className="font-serif text-3xl text-[#1a2e1a] font-light tracking-wide">
+                  Our Story inside the Garden
+                </h2>
+                <p className="font-sans text-xs tracking-[0.2em] text-[#8ea495] uppercase">
+                  A Journey of Love &amp; Companionship
+                </p>
+              </div>
+
+              {/* Interactive Card Slider */}
+              <div className="relative max-w-xl mx-auto md:mx-0 bg-white border border-[#e5e0d8] rounded-2xl p-8 shadow-[0_12px_40px_rgba(0,0,0,0.02)] min-h-[16rem] flex flex-col justify-between">
+                <div>
+                  <div className="text-4xl mb-4">{slides[currentSlide].emoji}</div>
+                  <h3 className="font-serif text-xl text-[#1a2e1a] font-semibold mb-3">
+                    {slides[currentSlide].title}
+                  </h3>
+                  <p className="font-serif text-sm italic text-gray-600 leading-relaxed max-w-md">
+                    "{slides[currentSlide].desc}"
+                  </p>
+                </div>
+
+                {/* Slider Dots indicators */}
+                <div className="flex justify-center md:justify-start gap-2 mt-8">
+                  {slides.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrentSlide(idx)}
+                      className={`w-2 h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                        idx === currentSlide ? "bg-[#d4af37] w-4" : "bg-gray-200"
+                      }`}
+                      aria-label={`Go to slide ${idx + 1}`}
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>
