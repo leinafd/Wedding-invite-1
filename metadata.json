@@ -1,0 +1,6 @@
+{
+  "name": "Nichelle & Eniola Proposal Party Invitation",
+  "description": "A 3D animated garden entrance invitation and integrated RSVP system for Nichelle & Eniola's proposal party on August 1st 2026.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
