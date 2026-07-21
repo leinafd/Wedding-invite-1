@@ -20,39 +20,97 @@ export default function CouplePhotos() {
       .catch((err) => console.error("Error loading image settings:", err));
   }, []);
 
+  const extensions = [".jpg", ".png", ".jpeg", ".webp"];
+
+  const handleImageError1 = () => {
+    // If it's a custom URL (e.g. starting with http), just fail
+    if (photo1Url.startsWith("http") || !photo1Url.startsWith("/assets/")) {
+      setPhotoError1(true);
+      return;
+    }
+
+    const dotIndex = photo1Url.lastIndexOf(".");
+    if (dotIndex === -1) {
+      setPhotoError1(true);
+      return;
+    }
+
+    const currentExt = photo1Url.substring(dotIndex).toLowerCase();
+    const currentIndex = extensions.indexOf(currentExt);
+    
+    if (currentIndex !== -1 && currentIndex < extensions.length - 1) {
+      const nextExt = extensions[currentIndex + 1];
+      const newUrl = `/assets/couple_photo1${nextExt}`;
+      console.log(`Trying alternative extension for photo 1: ${newUrl}`);
+      setPhoto1Url(newUrl);
+    } else {
+      setPhotoError1(true);
+    }
+  };
+
+  const handleImageError2 = () => {
+    // If it's a custom URL, just fail
+    if (photo2Url.startsWith("http") || !photo2Url.startsWith("/assets/")) {
+      setPhotoError2(true);
+      return;
+    }
+
+    const dotIndex = photo2Url.lastIndexOf(".");
+    if (dotIndex === -1) {
+      setPhotoError2(true);
+      return;
+    }
+
+    const currentExt = photo2Url.substring(dotIndex).toLowerCase();
+    const currentIndex = extensions.indexOf(currentExt);
+    
+    if (currentIndex !== -1 && currentIndex < extensions.length - 1) {
+      const nextExt = extensions[currentIndex + 1];
+      const newUrl = `/assets/couple_photo2${nextExt}`;
+      console.log(`Trying alternative extension for photo 2: ${newUrl}`);
+      setPhoto2Url(newUrl);
+    } else {
+      setPhotoError2(true);
+    }
+  };
+
   // The two couple photos
   const photos = [
     {
       src: photo1Url,
       alt: "Nichelle & Eniola smiling warmly at a romantic evening venue",
       error: photoError1,
-      setError: setPhotoError1,
+      handleError: handleImageError1,
     },
     {
       src: photo2Url,
       alt: "An intimate close-up of Nichelle & Eniola looking affectionately at each other",
       error: photoError2,
-      setError: setPhotoError2,
+      handleError: handleImageError2,
     }
   ];
 
+  // Filter active photos that loaded successfully
+  const activePhotos = photos.filter((p) => !p.error);
+  const hasPhotos = activePhotos.length > 0;
+  
+  // Safe bounded index for active photos
+  const safeIdx = currentIdx >= activePhotos.length ? 0 : currentIdx;
+
   // Rotate pictures every 5 seconds for a slow, organic slideshow feel
   useEffect(() => {
-    // Only auto-rotate if both photos load successfully
-    if (photoError1 || photoError2) return;
+    if (activePhotos.length <= 1) return;
 
     const interval = setInterval(() => {
-      setCurrentIdx((prev) => (prev + 1) % photos.length);
+      setCurrentIdx((prev) => (prev + 1) % activePhotos.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, [photoError1, photoError2, photos.length]);
-
-  const hasErrors = photoError1 || photoError2;
+  }, [activePhotos.length]);
 
   return (
     <div className="relative w-full max-w-sm mx-auto p-4">
       <AnimatePresence mode="wait">
-        {hasErrors ? (
+        {!hasPhotos ? (
           /* --- HIGHLY POLISHED ROMANTIC FALLBACK CARD --- */
           <motion.div
             key="fallback-card"
@@ -116,9 +174,9 @@ export default function CouplePhotos() {
         ) : (
           /* --- CINEMATIC ACTIVE POLAROID SLIDESHOW --- */
           <motion.div
-            key={currentIdx}
-            initial={{ opacity: 0, scale: 0.98, rotate: currentIdx === 0 ? -1 : 1 }}
-            animate={{ opacity: 1, scale: 1, rotate: currentIdx === 0 ? -1.5 : 1.5 }}
+            key={safeIdx}
+            initial={{ opacity: 0, scale: 0.98, rotate: safeIdx === 0 ? -1 : 1 }}
+            animate={{ opacity: 1, scale: 1, rotate: safeIdx === 0 ? -1.5 : 1.5 }}
             exit={{ opacity: 0, scale: 1.02 }}
             transition={{ duration: 0.85, ease: "easeInOut" }}
             className="w-full aspect-[3/4] bg-white border border-[#e5e0d8] p-3 pb-12 rounded-lg shadow-xl relative overflow-hidden flex flex-col justify-between"
@@ -132,10 +190,10 @@ export default function CouplePhotos() {
                 initial={{ scale: 1.02 }}
                 animate={{ scale: 1.09 }}
                 transition={{ duration: 5, ease: "linear" }}
-                src={photos[currentIdx].src}
-                alt={photos[currentIdx].alt}
+                src={activePhotos[safeIdx].src}
+                alt={activePhotos[safeIdx].alt}
                 referrerPolicy="no-referrer"
-                onError={() => photos[currentIdx].setError(true)}
+                onError={activePhotos[safeIdx].handleError}
                 className="w-full h-full object-cover"
               />
 
@@ -148,7 +206,7 @@ export default function CouplePhotos() {
             {/* Handwritten Polaroid Bottom Caption */}
             <div className="text-center pt-2.5 z-10">
               <p className="font-serif italic text-sm text-[#1a2e1a] tracking-wide">
-                {currentIdx === 0 ? "Nichelle & Eniola ♥" : "Always & Forever"}
+                {safeIdx === 0 ? "Nichelle & Eniola ♥" : "Always & Forever"}
               </p>
             </div>
           </motion.div>
@@ -156,14 +214,14 @@ export default function CouplePhotos() {
       </AnimatePresence>
 
       {/* Manual Picture Skipping Controls (Only visible if photos loaded successfully) */}
-      {!hasErrors && (
+      {hasPhotos && activePhotos.length > 1 && (
         <div className="flex justify-center gap-1.5 mt-4">
-          {photos.map((_, idx) => (
+          {activePhotos.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setCurrentIdx(idx)}
               className={`w-1.5 h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                idx === currentIdx ? "bg-[#d4af37] w-4" : "bg-gray-300 hover:bg-gray-400"
+                idx === safeIdx ? "bg-[#d4af37] w-4" : "bg-gray-300 hover:bg-gray-400"
               }`}
               title={`View photo ${idx + 1}`}
               aria-label={`View photo ${idx + 1}`}
