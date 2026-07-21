@@ -53,7 +53,7 @@ export default function InvitationContent({ onRSVPSubmitted, onOpenAdmin, isMute
 
   // Calculate Countdown
   useEffect(() => {
-    const targetDate = new Date("2026-08-01T17:00:00-04:00").getTime(); // 5:00 PM EDT
+    const targetDate = new Date("2026-08-01T18:00:00-04:00").getTime(); // 6:00 PM EDT (Garden opens)
 
     const updateTimer = () => {
       const now = new Date().getTime();
@@ -273,10 +273,10 @@ export default function InvitationContent({ onRSVPSubmitted, onOpenAdmin, isMute
                   The Time
                 </h4>
                 <p className="font-serif text-sm text-[#1a2e1a] font-semibold">
-                  5:00 PM EST
+                  6:00 PM EST
                 </p>
                 <p className="font-sans text-xs text-gray-500 mt-1">
-                  Doors Open
+                  Garden Opens
                 </p>
               </div>
             </div>
@@ -309,10 +309,10 @@ export default function InvitationContent({ onRSVPSubmitted, onOpenAdmin, isMute
                   Dress Code
                 </h4>
                 <p className="font-serif text-sm text-[#1a2e1a] font-semibold">
-                  Garden Semi-Formal
+                  Touch of Pink or Black
                 </p>
                 <p className="font-sans text-xs text-gray-600 mt-1.5 leading-relaxed">
-                  We kindly encourage earthy hues, soft sage greens, cream whites, pastels, and floral patterns to celebrate in the garden.
+                  We kindly encourage guests to celebrate with us in style wearing formal attire with a lovely touch of pink or classic black.
                 </p>
               </div>
             </div>
@@ -328,35 +328,35 @@ export default function InvitationContent({ onRSVPSubmitted, onOpenAdmin, isMute
               {/* Event 1 */}
               <div className="relative">
                 <div className="absolute -left-[30px] top-1 w-4 h-4 rounded-full border border-white bg-[#d4af37]" />
-                <span className="font-mono text-[10px] text-[#6c8675] tracking-widest uppercase">5:00 PM</span>
-                <h4 className="font-serif text-sm font-semibold text-[#1a2e1a]">Garden Reception &amp; Mocktails</h4>
-                <p className="font-sans text-xs text-gray-500 mt-0.5">Guests arrive and enjoy artisanal garden mocktails with soft instrumental soundscapes.</p>
+                <span className="font-mono text-[10px] text-[#6c8675] tracking-widest uppercase">6:00 PM</span>
+                <h4 className="font-serif text-sm font-semibold text-[#1a2e1a]">Garden Opens</h4>
+                <p className="font-sans text-xs text-gray-500 mt-0.5">Doors officially open for early guests to arrive and enjoy the quiet garden scenery.</p>
               </div>
 
               {/* Event 2 */}
               <div className="relative">
-                <div className="absolute -left-[30px] top-1 w-4 h-4 rounded-full border border-white bg-[#d4af37] animate-pulse" />
-                <span className="font-mono text-[10px] text-[#d4af37] tracking-widest uppercase font-semibold">5:30 PM</span>
-                <h4 className="font-serif text-sm font-semibold text-[#1a2e1a] flex items-center gap-1">
-                  The Surprise Garden Proposal <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500 animate-pulse" />
-                </h4>
-                <p className="font-sans text-xs text-gray-500 mt-0.5">Nichelle &amp; Eniola's special magical moment in the center rose arbor. Quiet reception requested.</p>
+                <div className="absolute -left-[30px] top-1 w-4 h-4 rounded-full border border-white bg-[#d4af37]" />
+                <span className="font-mono text-[10px] text-[#6c8675] tracking-widest uppercase font-semibold">7:00 PM</span>
+                <h4 className="font-serif text-sm font-semibold text-[#1a2e1a]">Guest Arrival &amp; Drinks</h4>
+                <p className="font-sans text-xs text-gray-500 mt-0.5">Time arrival for all invited guests. Settle in, grab a glass, and start socializing!</p>
               </div>
 
               {/* Event 3 */}
               <div className="relative">
                 <div className="absolute -left-[30px] top-1 w-4 h-4 rounded-full border border-white bg-[#d4af37]" />
-                <span className="font-mono text-[10px] text-[#6c8675] tracking-widest uppercase">6:00 PM</span>
-                <h4 className="font-serif text-sm font-semibold text-[#1a2e1a]">Celebration Toast &amp; Feast</h4>
-                <p className="font-sans text-xs text-gray-500 mt-0.5">Champagne toasts, speech dedications, and a rustic Mediterranean garden banquet dinner.</p>
+                <span className="font-mono text-[10px] text-[#6c8675] tracking-widest uppercase">Till 7:30 PM</span>
+                <h4 className="font-serif text-sm font-semibold text-[#1a2e1a]">Drinks &amp; Networking</h4>
+                <p className="font-sans text-xs text-gray-500 mt-0.5">Mingle, share laughs, and network with loved ones while enjoying signature garden drinks.</p>
               </div>
 
               {/* Event 4 */}
               <div className="relative">
-                <div className="absolute -left-[30px] top-1 w-4 h-4 rounded-full border border-white bg-[#d4af37]" />
-                <span className="font-mono text-[10px] text-[#6c8675] tracking-widest uppercase">8:00 PM</span>
-                <h4 className="font-serif text-sm font-semibold text-[#1a2e1a]">Dancing Under the Stars</h4>
-                <p className="font-sans text-xs text-gray-500 mt-0.5">Desserts served, sparklers lit, and celebrating into the night under warm firefly lights.</p>
+                <div className="absolute -left-[30px] top-1 w-4 h-4 rounded-full border border-white bg-[#d4af37] animate-pulse" />
+                <span className="font-mono text-[10px] text-[#d4af37] tracking-widest uppercase font-semibold">8:00 PM</span>
+                <h4 className="font-serif text-sm font-semibold text-[#1a2e1a] flex items-center gap-1">
+                  The Surprise Proposal <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500 animate-pulse" />
+                </h4>
+                <p className="font-sans text-xs text-gray-500 mt-0.5">The absolute highlight of the evening! Let's celebrate Nichelle &amp; Eniola's dream moment.</p>
               </div>
             </div>
           </div>
@@ -421,7 +421,7 @@ export default function InvitationContent({ onRSVPSubmitted, onOpenAdmin, isMute
               Garden Notes
             </h4>
             <p className="font-sans text-xs text-gray-600 leading-relaxed">
-              Parking is available inside the residence driveway and alongside Dover Springs Drive. Valet assistance will be provided. Please arrive 10-15 minutes prior to 5:30 PM to settle before the surprise moment!
+              Parking is available inside the residence driveway and alongside Dover Springs Drive. Valet assistance will be provided. Please arrive on time at 7:00 PM to settle before the surprise proposal at 8:00 PM!
             </p>
           </div>
         </div>
