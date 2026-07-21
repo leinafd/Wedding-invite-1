@@ -14,3 +14,9 @@ export interface RSVPStats {
   totalUndecided: number;
   totalGuests: number;
 }
+
+export interface AppSettings {
+  photo1Url: string;
+  photo2Url: string;
+}
+

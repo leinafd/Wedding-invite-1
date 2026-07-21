@@ -4,19 +4,32 @@ import { Heart, Sparkles, Camera, Image as ImageIcon } from "lucide-react";
 
 export default function CouplePhotos() {
   const [currentIdx, setCurrentIdx] = useState(0);
+  const [photo1Url, setPhoto1Url] = useState("/assets/couple_photo1.jpg");
+  const [photo2Url, setPhoto2Url] = useState("/assets/couple_photo2.jpg");
   const [photoError1, setPhotoError1] = useState(false);
   const [photoError2, setPhotoError2] = useState(false);
+
+  // Fetch live custom setting photo URLs
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.photo1Url) setPhoto1Url(data.photo1Url);
+        if (data.photo2Url) setPhoto2Url(data.photo2Url);
+      })
+      .catch((err) => console.error("Error loading image settings:", err));
+  }, []);
 
   // The two couple photos
   const photos = [
     {
-      src: "/assets/couple_photo1.jpg",
+      src: photo1Url,
       alt: "Nichelle & Eniola smiling warmly at a romantic evening venue",
       error: photoError1,
       setError: setPhotoError1,
     },
     {
-      src: "/assets/couple_photo2.jpg",
+      src: photo2Url,
       alt: "An intimate close-up of Nichelle & Eniola looking affectionately at each other",
       error: photoError2,
       setError: setPhotoError2,
@@ -32,7 +45,7 @@ export default function CouplePhotos() {
       setCurrentIdx((prev) => (prev + 1) % photos.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, [photoError1, photoError2]);
+  }, [photoError1, photoError2, photos.length]);
 
   const hasErrors = photoError1 || photoError2;
 

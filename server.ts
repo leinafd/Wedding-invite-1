@@ -23,6 +23,39 @@ if (!fs.existsSync(RSVPS_FILE)) {
   fs.writeFileSync(RSVPS_FILE, JSON.stringify([], null, 2), "utf8");
 }
 
+const SETTINGS_FILE = path.join(process.cwd(), "settings.json");
+
+// Initialize settings.json if not exists
+if (!fs.existsSync(SETTINGS_FILE)) {
+  fs.writeFileSync(
+    SETTINGS_FILE,
+    JSON.stringify({ photo1Url: "", photo2Url: "" }, null, 2),
+    "utf8"
+  );
+}
+
+// Read settings helper
+function getSettings() {
+  try {
+    const data = fs.readFileSync(SETTINGS_FILE, "utf8");
+    return JSON.parse(data);
+  } catch (error) {
+    console.error("Error reading settings file:", error);
+    return { photo1Url: "", photo2Url: "" };
+  }
+}
+
+// Save settings helper
+function saveSettings(settings: any) {
+  try {
+    fs.writeFileSync(SETTINGS_FILE, JSON.stringify(settings, null, 2), "utf8");
+    return true;
+  } catch (error) {
+    console.error("Error writing settings file:", error);
+    return false;
+  }
+}
+
 // Read RSVPs helper
 function getRSVPs() {
   try {
@@ -148,10 +181,45 @@ app.post("/api/upload-photo", (req, res) => {
     fs.writeFileSync(filePath, buffer);
     console.log(`Successfully saved photo to: ${filePath}`);
 
+    // Sync with settings.json
+    const settings = getSettings();
+    if (photoIndex === 1) {
+      settings.photo1Url = `/assets/${fileName}`;
+    } else if (photoIndex === 2) {
+      settings.photo2Url = `/assets/${fileName}`;
+    }
+    saveSettings(settings);
+
     res.json({ success: true, url: `/assets/${fileName}` });
   } catch (error: any) {
     console.error("Error saving uploaded photo:", error);
     res.status(500).json({ error: "Failed to save photo on server: " + error.message });
+  }
+});
+
+// Get application settings (custom photo URLs, etc.)
+app.get("/api/settings", (req, res) => {
+  const settings = getSettings();
+  res.json(settings);
+});
+
+// Update application settings (Protected by passcode)
+app.post("/api/settings", (req, res) => {
+  const passcode = req.headers["x-admin-passcode"];
+  const { photo1Url, photo2Url } = req.body;
+
+  if (passcode !== ADMIN_PASSCODE) {
+    return res.status(401).json({ error: "Unauthorized. Invalid passcode." });
+  }
+
+  const settings = getSettings();
+  if (photo1Url !== undefined) settings.photo1Url = photo1Url.trim();
+  if (photo2Url !== undefined) settings.photo2Url = photo2Url.trim();
+
+  if (saveSettings(settings)) {
+    res.json({ success: true, settings });
+  } else {
+    res.status(500).json({ error: "Failed to save settings." });
   }
 });
 
